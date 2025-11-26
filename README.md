@@ -6,8 +6,10 @@ A full-stack blog platform integrated with a professional portfolio, featuring m
 
 ### Blog System
 - ✅ Create, read, update, delete blog posts
+- ✅ **AI-powered blog post generation** using TR GPT API
 - ✅ Markdown support with syntax highlighting
 - ✅ Categories and tags
+- ✅ Multiple images per post (featured + gallery)
 - ✅ Search functionality
 - ✅ Pagination
 - ✅ View counter
@@ -145,9 +147,9 @@ cd frontend
 npm install
 ```
 
-3. Create `.env` file:
+3. Create `.env` file (see `ENV_SETUP.md` for details):
 ```bash
-# The file should contain:
+# Required variable:
 VITE_API_URL=http://localhost:8000/api
 ```
 
@@ -189,6 +191,10 @@ After running the seed script:
 - `GET /api/portfolio/skills` - Get skills
 - `GET /api/portfolio/projects` - Get projects
 - `GET /api/portfolio/experience` - Get experience
+
+### AI Blog Generation
+- `POST /api/ai/generate` - Generate blog post content (returns JSON)
+- `POST /api/ai/generate-and-post` - Generate and automatically publish blog post
 
 ## 🚢 Deployment
 
