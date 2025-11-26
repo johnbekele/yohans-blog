@@ -11,46 +11,146 @@ import {
   faSave,
   faArrowLeft,
   faMagic,
+  faKey,
+  faCog,
+  faFileAlt,
 } from '@fortawesome/free-solid-svg-icons'
 import AIBlogGenerator from '../components/AIBlogGenerator'
+import TokenManager from '../components/TokenManager'
+import ChangePassword from '../components/ChangePassword'
+import ProfileManagement from './ProfileManagement'
+import PortfolioManagement from './PortfolioManagement'
 
 const Admin = () => {
   return (
     <div className="min-h-screen bg-bg-primary py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Routes>
-          <Route path="/" element={<PostsList />} />
-          <Route path="/create" element={<PostEditor />} />
-          <Route path="/edit/:slug" element={<PostEditor />} />
-          <Route path="/ai-generator" element={<AIGeneratorPage />} />
+          <Route path="/posts" element={<PostsPage />} />
+          <Route path="/posts/create" element={<PostEditor />} />
+          <Route path="/posts/edit/:slug" element={<PostEditor />} />
+          <Route path="/portfolio" element={<PortfolioManagement />} />
+          <Route path="/profile" element={<ProfileManagement />} />
+          <Route path="/token" element={<TokenPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </div>
     </div>
   )
 }
 
-const AIGeneratorPage = () => {
-  const navigate = useNavigate()
+const PostsPage = () => {
+  const [activeTab, setActiveTab] = useState('manual') // 'manual' or 'ai'
 
   return (
     <>
       <div className="mb-8">
-        <Link
-          to="/admin"
-          className="inline-flex items-center text-accent-cyan hover:text-accent-lime transition-colors mb-4"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-          Back to Dashboard
-        </Link>
+        <h1 className="text-4xl font-bold mb-4">
+          <span className="text-accent-cyan">Posts</span> Management
+        </h1>
+        
+        {/* Tabs */}
+        <div className="flex space-x-4 border-b border-accent-cyan/20">
+          <button
+            onClick={() => setActiveTab('manual')}
+            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
+              activeTab === 'manual'
+                ? 'border-accent-cyan text-accent-cyan'
+                : 'border-transparent text-text-secondary hover:text-accent-cyan'
+            }`}
+          >
+            <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
+            Manual Posts
+          </button>
+          <button
+            onClick={() => setActiveTab('ai')}
+            className={`px-6 py-3 font-medium transition-colors border-b-2 ${
+              activeTab === 'ai'
+                ? 'border-accent-cyan text-accent-cyan'
+                : 'border-transparent text-text-secondary hover:text-accent-cyan'
+            }`}
+          >
+            <FontAwesomeIcon icon={faMagic} className="mr-2" />
+            AI Generator
+          </button>
+        </div>
+      </div>
+
+      {activeTab === 'manual' ? <PostsList /> : <AIGeneratorPage />}
+    </>
+  )
+}
+
+const AIGeneratorPage = () => {
+  const [showTokenManager, setShowTokenManager] = useState(false)
+
+  const handleTokenNeeded = () => {
+    setShowTokenManager(true)
+  }
+
+  return (
+    <>
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-text-primary">AI Blog Generator</h2>
+            <p className="text-text-secondary mt-2">
+              Generate professional blog posts instantly using AI
+            </p>
+          </div>
+          <Link
+            to="/admin/token"
+            className="px-4 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-colors font-medium flex items-center space-x-2"
+          >
+            <FontAwesomeIcon icon={faKey} />
+            <span>Manage Token</span>
+          </Link>
+        </div>
+      </div>
+
+      {showTokenManager ? (
+        <div className="mb-8">
+          <TokenManager onTokenSaved={() => setShowTokenManager(false)} />
+        </div>
+      ) : (
+        <AIBlogGenerator onTokenNeeded={handleTokenNeeded} />
+      )}
+    </>
+  )
+}
+
+const TokenPage = () => {
+  return (
+    <>
+      <div className="mb-8">
         <h1 className="text-4xl font-bold">
-          <span className="text-accent-cyan">AI</span> Blog Generator
+          <span className="text-accent-cyan">Token</span> Management
         </h1>
         <p className="text-text-secondary mt-2">
-          Generate professional blog posts instantly using AI
+          Configure your Open Arena ESSO token for AI features
         </p>
       </div>
 
-      <AIBlogGenerator />
+      <TokenManager />
+    </>
+  )
+}
+
+const SettingsPage = () => {
+  return (
+    <>
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold">
+          <span className="text-accent-cyan">Account</span> Settings
+        </h1>
+        <p className="text-text-secondary mt-2">
+          Manage your account settings and security
+        </p>
+      </div>
+
+      <div className="max-w-2xl">
+        <ChangePassword />
+      </div>
     </>
   )
 }
@@ -89,25 +189,14 @@ const PostsList = () => {
   return (
     <>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-bold">
-          <span className="text-accent-cyan">Admin</span> Dashboard
-        </h1>
-        <div className="flex space-x-4">
-          <Link
-            to="/admin/ai-generator"
-            className="px-6 py-3 bg-accent-lime/10 text-accent-lime border border-accent-lime/20 rounded-lg hover:bg-accent-lime/20 transition-colors font-medium"
-          >
-            <FontAwesomeIcon icon={faMagic} className="mr-2" />
-            AI Generator
-          </Link>
-          <Link
-            to="/admin/create"
-            className="px-6 py-3 bg-accent-cyan text-bg-primary rounded-lg hover:bg-accent-lime transition-colors font-medium"
-          >
-            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            New Post
-          </Link>
-        </div>
+        <h2 className="text-2xl font-bold text-text-primary">All Posts</h2>
+        <Link
+          to="/admin/posts/create"
+          className="px-6 py-3 bg-accent-cyan text-bg-primary rounded-lg hover:bg-accent-lime transition-colors font-medium"
+        >
+          <FontAwesomeIcon icon={faPlus} className="mr-2" />
+          New Post
+        </Link>
       </div>
 
       {loading ? (
@@ -155,7 +244,7 @@ const PostsList = () => {
                     <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm">{post.views}</td>
                     <td className="px-4 sm:px-6 py-3 sm:py-4 text-right space-x-2">
                       <Link
-                        to={`/admin/edit/${post.slug}`}
+                        to={`/admin/posts/edit/${post.slug}`}
                         className="inline-flex px-3 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-all border border-accent-cyan/20 text-sm"
                       >
                         <FontAwesomeIcon icon={faEdit} />
@@ -234,7 +323,7 @@ const PostEditor = () => {
         await createPost(postData)
       }
 
-      navigate('/admin')
+      navigate('/admin/posts')
     } catch (error) {
       alert('Error saving post')
     } finally {
@@ -246,11 +335,11 @@ const PostEditor = () => {
     <>
       <div className="mb-8">
         <Link
-          to="/admin"
+          to="/admin/posts"
           className="inline-flex items-center text-accent-cyan hover:text-accent-lime transition-colors mb-4"
         >
           <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-          Back to Dashboard
+          Back to Posts
         </Link>
         <h1 className="text-4xl font-bold">
           {slug ? 'Edit' : 'Create'} <span className="text-accent-cyan">Post</span>

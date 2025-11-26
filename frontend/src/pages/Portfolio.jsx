@@ -10,6 +10,7 @@ import {
   faExternalLinkAlt,
   faCode,
 } from '@fortawesome/free-solid-svg-icons'
+import ImageCarousel from '../components/ImageCarousel'
 
 const Portfolio = () => {
   const [portfolio, setPortfolio] = useState(null)
@@ -163,58 +164,90 @@ const Portfolio = () => {
             Featured <span className="text-accent-lime">Projects</span>
           </h2>
           <div className="divider-section max-w-md mx-auto"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            {projects.map((project, idx) => (
-              <div
-                key={idx}
-                className="card-elevated bg-bg-card rounded-lg overflow-hidden"
-              >
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
-                  <p className="text-accent-lime mb-4">{project.subtitle}</p>
-                  <p className="text-text-secondary mb-4">
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tech_stack.map((tech, tidx) => (
-                      <span
-                        key={tidx}
-                        className="px-3 py-1 bg-accent-cyan/10 text-accent-cyan text-sm rounded-full"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-3 sm:gap-4">
-                    {project.demo_url && (
-                      <a
-                        href={project.demo_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 rounded-lg hover:bg-accent-cyan/20 transition-all shadow-sm text-sm font-medium"
-                      >
-                        <FontAwesomeIcon
-                          icon={faExternalLinkAlt}
-                          className="mr-2"
-                        />
-                        Demo
-                      </a>
-                    )}
-                    {project.repo_url && (
-                      <a
-                        href={project.repo_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 py-2 card-elevated bg-bg-secondary rounded-lg hover:bg-bg-primary transition-all text-sm font-medium"
-                      >
-                        <FontAwesomeIcon icon={faCode} className="mr-2" />
-                        Code
-                      </a>
-                    )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {projects.map((project, idx) => {
+              // Get images - prefer images array, fallback to single image
+              // Filter out empty/null/undefined values
+              let projectImages = []
+              
+              if (project.images && Array.isArray(project.images) && project.images.length > 0) {
+                projectImages = project.images.filter(img => img && img.trim() !== '')
+              } else if (project.image && project.image.trim() !== '') {
+                projectImages = [project.image]
+              }
+              
+              return (
+                <div
+                  key={idx}
+                  className="card-elevated bg-bg-card rounded-lg overflow-hidden flex flex-col"
+                >
+                  {/* Image Carousel */}
+                  {projectImages.length > 0 ? (
+                    <div className="w-full">
+                      <ImageCarousel 
+                        images={projectImages} 
+                        autoSwipeInterval={5000}
+                        className="w-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 sm:h-56 bg-bg-secondary rounded-lg flex items-center justify-center">
+                      <p className="text-text-secondary text-sm">No image available</p>
+                    </div>
+                  )}
+                  
+                  <div className="p-4 flex-1 flex flex-col">
+                    <h3 className="text-lg font-bold mb-1 line-clamp-1">{project.title}</h3>
+                    <p className="text-accent-lime text-sm mb-2 line-clamp-1">{project.subtitle}</p>
+                    <p className="text-text-secondary text-sm mb-3 line-clamp-3 flex-1">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {project.tech_stack.slice(0, 3).map((tech, tidx) => (
+                        <span
+                          key={tidx}
+                          className="px-2 py-0.5 bg-accent-cyan/10 text-accent-cyan text-xs rounded-full"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {project.tech_stack.length > 3 && (
+                        <span className="px-2 py-0.5 bg-bg-secondary text-text-secondary text-xs rounded-full">
+                          +{project.tech_stack.length - 3}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-auto">
+                      {project.demo_url && (
+                        <a
+                          href={project.demo_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 rounded-lg hover:bg-accent-cyan/20 transition-all text-xs font-medium flex items-center"
+                        >
+                          <FontAwesomeIcon
+                            icon={faExternalLinkAlt}
+                            className="mr-1 text-xs"
+                          />
+                          Demo
+                        </a>
+                      )}
+                      {project.repo_url && (
+                        <a
+                          href={project.repo_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 card-elevated bg-bg-secondary rounded-lg hover:bg-bg-primary transition-all text-xs font-medium flex items-center"
+                        >
+                          <FontAwesomeIcon icon={faCode} className="mr-1 text-xs" />
+                          Code
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>

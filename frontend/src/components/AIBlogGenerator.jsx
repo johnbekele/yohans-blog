@@ -1,19 +1,49 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { generateAndPostBlog } from '../services/aiService'
+import { getTokenStatus } from '../services/tokenService'
+import { logError, getErrorMessage } from '../utils/errorHandler'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagic, faSpinner, faCheck, faRocket } from '@fortawesome/free-solid-svg-icons'
+import { faMagic, faSpinner, faCheck, faRocket, faExclamationTriangle, faKey } from '@fortawesome/free-solid-svg-icons'
 
-const AIBlogGenerator = () => {
+const AIBlogGenerator = ({ onTokenNeeded }) => {
   const [idea, setIdea] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const [tokenStatus, setTokenStatus] = useState(null)
+  const [checkingToken, setCheckingToken] = useState(true)
+
+  useEffect(() => {
+    checkTokenStatus()
+  }, [])
+
+  const checkTokenStatus = async () => {
+    setCheckingToken(true)
+    try {
+      const status = await getTokenStatus()
+      setTokenStatus(status)
+    } catch (err) {
+      logError('AIBlogGenerator.checkTokenStatus', err)
+      setError('Failed to check token status. Please refresh the page.')
+    } finally {
+      setCheckingToken(false)
+    }
+  }
 
   const handleGenerate = async (e) => {
     e.preventDefault()
     
     if (!idea.trim()) {
       setError('Please enter an idea for your blog post')
+      return
+    }
+
+    // Check token status before generating
+    if (!tokenStatus?.has_token || !tokenStatus?.token_valid) {
+      setError('Please configure a valid Open Arena token first')
+      if (onTokenNeeded) {
+        onTokenNeeded()
+      }
       return
     }
 
@@ -26,7 +56,17 @@ const AIBlogGenerator = () => {
       setResult(response)
       setIdea('') // Clear the input
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to generate blog post. Please try again.')
+      const errorMsg = getErrorMessage(err)
+      setError(errorMsg)
+      logError('AIBlogGenerator.handleGenerate', err)
+      
+      // If token error, refresh token status
+      if (errorMsg.toLowerCase().includes('token') || errorMsg.toLowerCase().includes('expired') || errorMsg.toLowerCase().includes('invalid')) {
+        checkTokenStatus()
+        if (onTokenNeeded) {
+          onTokenNeeded()
+        }
+      }
     } finally {
       setLoading(false)
     }
@@ -42,9 +82,35 @@ const AIBlogGenerator = () => {
         </div>
       </div>
 
+      {/* Token Status Warning */}
+      {!checkingToken && (!tokenStatus?.has_token || !tokenStatus?.token_valid) && (
+        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+          <div className="flex items-start space-x-3">
+            <FontAwesomeIcon icon={faExclamationTriangle} className="text-yellow-400 text-xl mt-1" />
+            <div className="flex-1">
+              <p className="font-medium text-yellow-400 mb-1">Token Required</p>
+              <p className="text-text-secondary text-sm mb-3">
+                {tokenStatus?.has_token 
+                  ? 'Your Open Arena token has expired. Please update it to use AI features.'
+                  : 'Please configure your Open Arena ESSO token to use AI blog generation.'}
+              </p>
+              {onTokenNeeded && (
+                <button
+                  onClick={onTokenNeeded}
+                  className="px-4 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-colors text-sm flex items-center space-x-2"
+                >
+                  <FontAwesomeIcon icon={faKey} />
+                  <span>Configure Token</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleGenerate} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label className="block text-sm font-medium mb-2 text-text-primary">
             What would you like to write about?
           </label>
           <textarea

@@ -1,7 +1,41 @@
 """AI Service for blog post generation"""
 import httpx
-from typing import Optional, List
+from typing import Optional, List, Dict
 from ..config import settings
+
+TR_API_BASE = "https://aiopenarena.gcs.int.thomsonreuters.com"
+
+
+async def validate_token(token: str) -> Dict:
+    """
+    Validate Open Arena ESSO token by calling GET /v1/user endpoint
+    
+    Returns:
+        dict with 'valid' (bool) and 'error' (str if invalid)
+    """
+    try:
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                f"{TR_API_BASE}/v1/user",
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                return {"valid": True, "data": response.json()}
+            elif response.status_code == 401:
+                return {"valid": False, "error": "Token is expired or invalid"}
+            else:
+                return {"valid": False, "error": f"Token validation failed: {response.status_code}"}
+                
+    except httpx.TimeoutException:
+        return {"valid": False, "error": "Token validation request timed out"}
+    except Exception as e:
+        return {"valid": False, "error": f"Error validating token: {str(e)}"}
 
 
 async def validate_and_fix_images(featured_image: Optional[str], images: List[str], topic: str) -> tuple:
@@ -73,18 +107,19 @@ class AIBlogGenerator:
         self.api_url = "https://aiopenarena.gcs.int.thomsonreuters.com/v1/inference"
         self.workflow_id = "80f448d2-fd59-440f-ba24-ebc3014e1fdf"
     
-    async def generate_blog_post(self, user_idea: str) -> dict:
+    async def generate_blog_post(self, user_idea: str, token: str) -> dict:
         """
         Generate a blog post from user's idea
         
         Args:
             user_idea: The topic or idea for the blog post
+            token: Open Arena ESSO token for authentication
             
         Returns:
             dict with generated blog content
         """
-        if not settings.TR_GPT_TOKEN:
-            raise ValueError("TR_GPT_TOKEN not configured in environment variables")
+        if not token:
+            raise ValueError("Open Arena ESSO token is required")
         
         # Create a detailed prompt for blog generation
         prompt = f"""Write a blog post about: {user_idea}
@@ -136,7 +171,7 @@ Format as JSON:
 Write as Yohans (John) - a Software Engineer who loves tech but keeps it real."""
 
         headers = {
-            "Authorization": f"Bearer {settings.TR_GPT_TOKEN}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/json"
         }
         

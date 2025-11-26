@@ -1,13 +1,15 @@
 """AI blog generation routes"""
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Optional
 
-from ..services.ai_service import ai_blog_generator
-from ..utils.security import decode_token
-from ..database import get_database
+from ..services.ai_service import ai_blog_generator, validate_token
+from ..middleware.auth_middleware import get_current_admin_user
+from ..schemas.auth import TokenData
+from ..database import get_database, USERS_COLLECTION
 from datetime import datetime
 import re
+from bson import ObjectId
 
 router = APIRouter()
 
@@ -36,10 +38,18 @@ def create_slug(title: str) -> str:
     return slug[:100]
 
 
+async def get_user_token(user_id: str) -> Optional[str]:
+    """Get user's saved Open Arena token from database"""
+    db = get_database()
+    users_collection = db[USERS_COLLECTION]
+    user = await users_collection.find_one({"_id": ObjectId(user_id)})
+    return user.get("tr_gpt_token") if user else None
+
+
 @router.post("/generate", response_model=AIBlogResponse)
 async def generate_blog_post(
     request: AIBlogRequest,
-    token: str = Depends(lambda: None)  # We'll add proper auth later
+    current_user: TokenData = Depends(get_current_admin_user)
 ):
     """
     Generate a blog post using AI based on user's idea
@@ -47,8 +57,25 @@ async def generate_blog_post(
     - **idea**: The topic or concept for the blog post
     """
     try:
+        # Get user's token
+        token = await get_user_token(current_user.user_id)
+        
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No Open Arena token found. Please add your ESSO token in the admin panel."
+            )
+        
+        # Validate token before use
+        validation = await validate_token(token)
+        if not validation.get("valid"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Your token is expired or invalid. Please update it. Error: {validation.get('error')}"
+            )
+        
         # Generate blog post using AI
-        result = await ai_blog_generator.generate_blog_post(request.idea)
+        result = await ai_blog_generator.generate_blog_post(request.idea, token)
         
         if not result.get("success"):
             raise HTTPException(status_code=500, detail=result.get("error", "Failed to generate blog post"))
@@ -69,6 +96,7 @@ async def generate_blog_post(
 @router.post("/generate-and-post")
 async def generate_and_post_blog(
     request: AIBlogRequest,
+    current_user: TokenData = Depends(get_current_admin_user)
 ):
     """
     Generate a blog post using AI and automatically post it
@@ -76,8 +104,25 @@ async def generate_and_post_blog(
     - **idea**: The topic or concept for the blog post
     """
     try:
+        # Get user's token
+        token = await get_user_token(current_user.user_id)
+        
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No Open Arena token found. Please add your ESSO token in the admin panel."
+            )
+        
+        # Validate token before use
+        validation = await validate_token(token)
+        if not validation.get("valid"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Your token is expired or invalid. Please update it. Error: {validation.get('error')}"
+            )
+        
         # Generate blog post
-        result = await ai_blog_generator.generate_blog_post(request.idea)
+        result = await ai_blog_generator.generate_blog_post(request.idea, token)
         
         if not result.get("success"):
             raise HTTPException(status_code=500, detail=result.get("error", "Failed to generate blog post"))

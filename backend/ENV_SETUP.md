@@ -16,6 +16,15 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 # Thomson Reuters GPT API
 TR_GPT_TOKEN=your_esso_token_here
 
+# SMTP Email Configuration (for password reset)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+
+# Frontend URL (for email links)
+FRONTEND_URL=http://localhost:5174
+
 # CORS Origins (comma-separated)
 CORS_ORIGINS=http://localhost:5174,http://localhost:3000
 

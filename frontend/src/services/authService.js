@@ -1,59 +1,116 @@
 import api from './api'
+import { setItem, getItem, removeItem, parseJSON, STORAGE_KEYS } from '../utils/secureStorage'
+import { logError } from '../utils/errorHandler'
 
 export const login = async (email, password) => {
-  const response = await api.post('/auth/login', { email, password })
-  const { access_token, refresh_token, user } = response.data
-  
-  // Store tokens and user info
-  localStorage.setItem('access_token', access_token)
-  localStorage.setItem('refresh_token', refresh_token)
-  localStorage.setItem('user', JSON.stringify(user))
-  
-  return response.data
+  try {
+    const response = await api.post('/auth/login', { email, password })
+    const { access_token, refresh_token, user } = response.data
+    
+    // Store tokens and user info securely
+    setItem(STORAGE_KEYS.ACCESS_TOKEN, access_token)
+    setItem(STORAGE_KEYS.REFRESH_TOKEN, refresh_token)
+    setItem(STORAGE_KEYS.USER, JSON.stringify(user))
+    
+    return response.data
+  } catch (error) {
+    logError('AuthService.login', error)
+    throw error
+  }
 }
 
 export const register = async (username, email, password, role = 'user') => {
-  const response = await api.post('/auth/register', {
-    username,
-    email,
-    password,
-    role,
-  })
-  const { access_token, refresh_token, user } = response.data
-  
-  // Store tokens and user info
-  localStorage.setItem('access_token', access_token)
-  localStorage.setItem('refresh_token', refresh_token)
-  localStorage.setItem('user', JSON.stringify(user))
-  
-  return response.data
+  try {
+    const response = await api.post('/auth/register', {
+      username,
+      email,
+      password,
+      role,
+    })
+    const { access_token, refresh_token, user } = response.data
+    
+    // Store tokens and user info securely
+    setItem(STORAGE_KEYS.ACCESS_TOKEN, access_token)
+    setItem(STORAGE_KEYS.REFRESH_TOKEN, refresh_token)
+    setItem(STORAGE_KEYS.USER, JSON.stringify(user))
+    
+    return response.data
+  } catch (error) {
+    logError('AuthService.register', error)
+    throw error
+  }
 }
 
 export const logout = () => {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-  localStorage.removeItem('user')
+  try {
+    removeItem(STORAGE_KEYS.ACCESS_TOKEN)
+    removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+    removeItem(STORAGE_KEYS.USER)
+  } catch (error) {
+    logError('AuthService.logout', error)
+  }
 }
 
 export const getCurrentUser = async () => {
-  const response = await api.get('/auth/me')
-  return response.data
+  try {
+    const response = await api.get('/auth/me')
+    return response.data
+  } catch (error) {
+    logError('AuthService.getCurrentUser', error)
+    throw error
+  }
 }
 
 export const getAccessToken = () => {
-  return localStorage.getItem('access_token')
+  return getItem(STORAGE_KEYS.ACCESS_TOKEN)
 }
 
 export const getRefreshToken = () => {
-  return localStorage.getItem('refresh_token')
+  return getItem(STORAGE_KEYS.REFRESH_TOKEN)
 }
 
 export const getStoredUser = () => {
-  const user = localStorage.getItem('user')
-  return user ? JSON.parse(user) : null
+  const user = getItem(STORAGE_KEYS.USER)
+  return parseJSON(user, null)
 }
 
 export const isAuthenticated = () => {
   return !!getAccessToken()
+}
+
+export const forgotPassword = async (email) => {
+  try {
+    const response = await api.post('/auth/forgot-password', { email })
+    return response.data
+  } catch (error) {
+    logError('AuthService.forgotPassword', error)
+    throw error
+  }
+}
+
+export const resetPassword = async (token, newPassword) => {
+  try {
+    const response = await api.post('/auth/reset-password', {
+      token,
+      new_password: newPassword
+    })
+    return response.data
+  } catch (error) {
+    logError('AuthService.resetPassword', error)
+    throw error
+  }
+}
+
+export const changePassword = async (currentPassword, newPassword) => {
+  try {
+    const response = await api.post('/auth/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword
+    })
+    return response.data
+  } catch (error) {
+    logError('AuthService.changePassword', error)
+    throw error
+  }
 }
 

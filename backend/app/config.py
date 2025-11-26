@@ -23,6 +23,13 @@ class Settings(BaseSettings):
     # CORS - accepts comma-separated string from .env
     CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
     
+    # SMTP Email Configuration
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    FRONTEND_URL: str = "http://localhost:5174"
+    
     # Application
     APP_NAME: str = "Blog Portfolio API"
     APP_VERSION: str = "1.0.0"

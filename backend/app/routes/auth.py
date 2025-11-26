@@ -1,12 +1,19 @@
 """Authentication routes"""
 from fastapi import APIRouter, HTTPException, status, Depends
 from datetime import datetime
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+from bson import ObjectId
 
 from ..database import get_database, USERS_COLLECTION
 from ..schemas.auth import UserCreate, UserLogin, Token, UserResponse, RefreshTokenRequest
-from ..utils.security import get_password_hash, verify_password, create_access_token, create_refresh_token, decode_token
+from ..utils.security import (
+    get_password_hash, verify_password, create_access_token, create_refresh_token, 
+    decode_token, create_password_reset_token, verify_password_reset_token
+)
 from ..middleware.auth_middleware import get_current_user
 from ..schemas.auth import TokenData
+from ..services.email_service import email_service
 
 
 router = APIRouter()
@@ -132,7 +139,7 @@ async def refresh_token(request: RefreshTokenRequest):
     # Get user from database
     db = get_database()
     users_collection = db[USERS_COLLECTION]
-    user = await users_collection.find_one({"_id": token_data.user_id})
+    user = await users_collection.find_one({"_id": ObjectId(token_data.user_id)})
     
     if not user:
         raise HTTPException(
@@ -171,7 +178,7 @@ async def get_current_user_info(current_user: TokenData = Depends(get_current_us
     db = get_database()
     users_collection = db[USERS_COLLECTION]
     
-    user = await users_collection.find_one({"_id": current_user.user_id})
+    user = await users_collection.find_one({"_id": ObjectId(current_user.user_id)})
     
     if not user:
         raise HTTPException(
@@ -186,4 +193,192 @@ async def get_current_user_info(current_user: TokenData = Depends(get_current_us
         role=user["role"],
         created_at=user["created_at"].isoformat()
     )
+
+
+class PasswordResetRequest(BaseModel):
+    """Password reset request schema"""
+    email: EmailStr
+
+
+class PasswordReset(BaseModel):
+    """Password reset schema"""
+    token: str
+    new_password: str
+
+
+class ChangePassword(BaseModel):
+    """Change password schema"""
+    current_password: str
+    new_password: str
+
+
+@router.post("/logout")
+async def logout(current_user: TokenData = Depends(get_current_user)):
+    """Logout user (client-side token removal, this is for logging)"""
+    # In a stateless JWT system, logout is handled client-side
+    # This endpoint can be used for logging or future token blacklisting
+    return {"message": "Logged out successfully"}
+
+
+@router.post("/forgot-password")
+async def forgot_password(request: PasswordResetRequest):
+    """Request password reset - sends email with reset link"""
+    db = get_database()
+    users_collection = db[USERS_COLLECTION]
+    
+    # Find user by email
+    user = await users_collection.find_one({"email": request.email})
+    
+    # Always return success to prevent email enumeration
+    if not user:
+        return {
+            "message": "If an account with that email exists, a password reset link has been sent."
+        }
+    
+    # Generate reset token
+    reset_token = create_password_reset_token(user["email"])
+    
+    # Save reset token to user document (optional, for tracking)
+    await users_collection.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "password_reset_token": reset_token,
+                "password_reset_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    # Send email
+    email_sent = email_service.send_password_reset_email(
+        to_email=user["email"],
+        reset_token=reset_token,
+        username=user["username"]
+    )
+    
+    if not email_sent:
+        # Log error but don't expose it to user
+        print(f"Failed to send password reset email to {user['email']}")
+    
+    return {
+        "message": "If an account with that email exists, a password reset link has been sent."
+    }
+
+
+@router.post("/reset-password")
+async def reset_password(request: PasswordReset):
+    """Reset password using reset token"""
+    # Verify token
+    email = verify_password_reset_token(request.token)
+    
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+    
+    db = get_database()
+    users_collection = db[USERS_COLLECTION]
+    
+    # Find user by email
+    user = await users_collection.find_one({"email": email})
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Validate new password
+    if len(request.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters long"
+        )
+    
+    # Update password
+    new_password_hash = get_password_hash(request.new_password)
+    
+    await users_collection.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "password": new_password_hash,
+                "updated_at": datetime.utcnow()
+            },
+            "$unset": {
+                "password_reset_token": "",
+                "password_reset_at": ""
+            }
+        }
+    )
+    
+    # Send confirmation email
+    email_service.send_password_changed_email(
+        to_email=user["email"],
+        username=user["username"]
+    )
+    
+    return {"message": "Password has been reset successfully"}
+
+
+@router.post("/change-password")
+async def change_password(
+    request: ChangePassword,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """Change password for authenticated user"""
+    db = get_database()
+    users_collection = db[USERS_COLLECTION]
+    
+    # Find user
+    user = await users_collection.find_one({"_id": ObjectId(current_user.user_id)})
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify current password
+    if not verify_password(request.current_password, user["password"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Validate new password
+    if len(request.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 6 characters long"
+        )
+    
+    # Check if new password is different
+    if verify_password(request.new_password, user["password"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different from current password"
+        )
+    
+    # Update password
+    new_password_hash = get_password_hash(request.new_password)
+    
+    await users_collection.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "password": new_password_hash,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    # Send confirmation email
+    email_service.send_password_changed_email(
+        to_email=user["email"],
+        username=user["username"]
+    )
+    
+    return {"message": "Password has been changed successfully"}
 

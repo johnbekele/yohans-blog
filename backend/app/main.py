@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from .config import settings
 from .database import connect_to_mongo, close_mongo_connection
-from .routes import auth, posts, portfolio, ai_blog
+from .routes import auth, posts, portfolio, ai_blog, token_management
 
 
 @asynccontextmanager
@@ -46,6 +46,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(posts.router, prefix="/api/posts", tags=["Blog Posts"])
 app.include_router(portfolio.router, prefix="/api/portfolio", tags=["Portfolio"])
 app.include_router(ai_blog.router, prefix="/api/ai", tags=["AI Blog Generation"])
+app.include_router(token_management.router, prefix="/api/token", tags=["Token Management"])
 
 
 @app.get("/")

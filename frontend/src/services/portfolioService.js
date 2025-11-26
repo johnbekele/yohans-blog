@@ -25,3 +25,13 @@ export const getExperience = async () => {
   return response.data
 }
 
+export const updatePersonalInfo = async (data) => {
+  const response = await api.put('/portfolio/info', data)
+  return response.data
+}
+
+export const updatePortfolio = async (data) => {
+  const response = await api.put('/portfolio', data)
+  return response.data
+}
+

@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { getItem, setItem, removeItem, STORAGE_KEYS } from '../utils/secureStorage'
+import { logError } from '../utils/errorHandler'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
@@ -8,18 +10,20 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000, // 30 second timeout
 })
 
 // Request interceptor to add token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = getItem(STORAGE_KEYS.ACCESS_TOKEN)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
   (error) => {
+    logError('API.request', error)
     return Promise.reject(error)
   }
 )
@@ -35,27 +39,37 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        const refreshToken = localStorage.getItem('refresh_token')
+        const refreshToken = getItem(STORAGE_KEYS.REFRESH_TOKEN)
         if (refreshToken) {
           const response = await axios.post(`${API_URL}/auth/refresh`, {
             refresh_token: refreshToken,
           })
 
           const { access_token, refresh_token: newRefreshToken } = response.data
-          localStorage.setItem('access_token', access_token)
-          localStorage.setItem('refresh_token', newRefreshToken)
+          setItem(STORAGE_KEYS.ACCESS_TOKEN, access_token)
+          setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken)
 
           originalRequest.headers.Authorization = `Bearer ${access_token}`
           return api(originalRequest)
         }
       } catch (refreshError) {
         // Refresh failed, logout user
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('user')
-        window.location.href = '/login'
+        logError('API.tokenRefresh', refreshError)
+        removeItem(STORAGE_KEYS.ACCESS_TOKEN)
+        removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+        removeItem(STORAGE_KEYS.USER)
+        
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login'
+        }
         return Promise.reject(refreshError)
       }
+    }
+
+    // Log non-401 errors in development
+    if (error.response?.status !== 401) {
+      logError('API.response', error)
     }
 
     return Promise.reject(error)

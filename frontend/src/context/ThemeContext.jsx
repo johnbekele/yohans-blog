@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { getItem, setItem, STORAGE_KEYS } from '../utils/secureStorage'
 
-const ThemeContext = createContext(null)
+const ThemeContext = createContext()
 
 export const useTheme = () => {
   const context = useContext(ThemeContext)
@@ -11,28 +12,28 @@ export const useTheme = () => {
 }
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    const stored = localStorage.getItem('theme')
-    return stored || 'dark'
-  })
+  const [theme, setTheme] = useState('dark')
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
+    const stored = getItem(STORAGE_KEYS.THEME)
+    if (stored && (stored === 'dark' || stored === 'light')) {
+      setTheme(stored)
+      document.documentElement.setAttribute('data-theme', stored)
+    }
+  }, [])
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark')
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    setItem(STORAGE_KEYS.THEME, newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
   }
 
-  const value = {
-    theme,
-    toggleTheme,
-    isDark: theme === 'dark',
-  }
-
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  )
 }
 
 export default ThemeContext
-
