@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark Mode (Default) */
+:root,
+[data-theme="dark"] {
+  --accent-cyan: #94a3b8;
+  --accent-lime: #cbd5e1;
+  --accent-cyan-dim: rgba(148, 163, 184, 0.1);
+  --accent-lime-dim: rgba(203, 213, 225, 0.1);
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+}
+
+/* Light Mode */
+[data-theme="light"] {
+  --accent-cyan: #64748b;
+  --accent-lime: #475569;
+  --accent-cyan-dim: rgba(100, 116, 139, 0.1);
+  --accent-lime-dim: rgba(71, 85, 105, 0.1);
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-card: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+code {
+  font-family: 'Fira Code', monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #52525b;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #71717a;
+}
+
+/* Smooth transitions */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Loading animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading {
+  animation: spin 1s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Professional Enterprise Borders & Separators */
+.border-professional {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .border-professional {
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+.divider-gradient {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(148, 163, 184, 0.3) 20%,
+    rgba(148, 163, 184, 0.3) 80%,
+    transparent
+  );
+}
+
+[data-theme="light"] .divider-gradient {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(100, 116, 139, 0.25) 20%,
+    rgba(100, 116, 139, 0.25) 80%,
+    transparent
+  );
+}
+
+.divider-section {
+  position: relative;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(148, 163, 184, 0.2) 15%,
+    rgba(203, 213, 225, 0.3) 50%,
+    rgba(148, 163, 184, 0.2) 85%,
+    transparent
+  );
+  margin: 3rem 0;
+}
+
+[data-theme="light"] .divider-section {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(100, 116, 139, 0.2) 15%,
+    rgba(71, 85, 105, 0.25) 50%,
+    rgba(100, 116, 139, 0.2) 85%,
+    transparent
+  );
+}
+
+/* Mobile responsive dividers */
+@media (max-width: 768px) {
+  .divider-section {
+    margin: 2rem 0;
+    height: 1px;
+  }
+}
+
+/* Card with elevated border */
+.card-elevated {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.1), 
+    0 1px 2px -1px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(148, 163, 184, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-elevated:hover {
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+    0 2px 4px -2px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(148, 163, 184, 0.1);
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .card-elevated {
+  border: 1px solid rgba(100, 116, 139, 0.15);
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.05), 
+    0 1px 2px -1px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(100, 116, 139, 0.08);
+}
+
+[data-theme="light"] .card-elevated:hover {
+  border-color: rgba(100, 116, 139, 0.3);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.08), 
+    0 2px 4px -2px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(100, 116, 139, 0.15);
+}
+
+/* Subtle inset borders */
+.border-inset {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .border-inset {
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+}
+

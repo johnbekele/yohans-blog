@@ -38,7 +38,7 @@ const AIBlogGenerator = () => {
         <FontAwesomeIcon icon={faMagic} className="text-3xl text-accent-cyan mr-4" />
         <div>
           <h2 className="text-2xl font-bold">AI Blog Generator</h2>
-          <p className="text-text-secondary text-sm">Powered by Thomson Reuters GPT</p>
+          <p className="text-text-secondary text-sm">Powered by GPT</p>
         </div>
       </div>
 
