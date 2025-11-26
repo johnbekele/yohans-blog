@@ -65,12 +65,12 @@ const Portfolio = () => {
               <p className="text-text-secondary text-lg mb-6">
                 {personal_info.bio}
               </p>
-              <div className="flex space-x-4">
+              <div className="flex flex-wrap gap-3 sm:gap-4">
                 <a
                   href={personal_info.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-3 bg-bg-card border border-accent-cyan/20 rounded-lg hover:bg-accent-cyan/10 transition-colors"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 card-elevated bg-bg-card rounded-lg hover:bg-bg-secondary transition-all text-sm sm:text-base"
                 >
                   <FontAwesomeIcon icon={faGithub} className="mr-2" />
                   GitHub
@@ -79,24 +79,25 @@ const Portfolio = () => {
                   href={personal_info.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-6 py-3 bg-bg-card border border-accent-lime/20 rounded-lg hover:bg-accent-lime/10 transition-colors"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 card-elevated bg-bg-card rounded-lg hover:bg-bg-secondary transition-all text-sm sm:text-base"
                 >
                   <FontAwesomeIcon icon={faLinkedin} className="mr-2" />
                   LinkedIn
                 </a>
                 <a
                   href={`mailto:${personal_info.email}`}
-                  className="px-6 py-3 bg-accent-cyan text-bg-primary rounded-lg hover:bg-accent-lime transition-colors"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 rounded-lg hover:bg-accent-cyan/20 transition-all shadow-sm text-sm sm:text-base"
                 >
                   <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
                   Contact
                 </a>
               </div>
             </div>
-            <div className="bg-bg-card p-8 rounded-lg border border-accent-cyan/20">
+            <div className="card-elevated bg-bg-card p-6 sm:p-8 rounded-lg">
               <h3 className="text-2xl font-bold mb-4 text-accent-lime">
                 Quick Stats
               </h3>
+              <div className="divider-gradient mb-4"></div>
               <div className="space-y-4">
                 <div>
                   <p className="text-text-secondary">Experience</p>
@@ -119,14 +120,15 @@ const Portfolio = () => {
       {/* Skills Section */}
       <section className="py-20 bg-bg-primary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold mb-12 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-center">
             <span className="text-accent-cyan">Skills</span> & Technologies
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="divider-section max-w-md mx-auto"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {skills.map((skillCat, idx) => (
               <div
                 key={idx}
-                className="bg-bg-card p-6 rounded-lg border border-accent-cyan/20"
+                className="card-elevated bg-bg-card p-4 sm:p-6 rounded-lg"
               >
                 <div className="text-4xl mb-4">{skillCat.icon}</div>
                 <h3 className="text-xl font-bold mb-4">{skillCat.category}</h3>
@@ -157,14 +159,15 @@ const Portfolio = () => {
       {/* Projects Section */}
       <section className="py-20 bg-bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold mb-12 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-center">
             Featured <span className="text-accent-lime">Projects</span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="divider-section max-w-md mx-auto"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {projects.map((project, idx) => (
               <div
                 key={idx}
-                className="bg-bg-card rounded-lg overflow-hidden border border-accent-cyan/20 hover:shadow-xl hover:shadow-accent-cyan/10 transition-all"
+                className="card-elevated bg-bg-card rounded-lg overflow-hidden"
               >
                 <div className="p-6">
                   <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
@@ -182,13 +185,13 @@ const Portfolio = () => {
                       </span>
                     ))}
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex flex-wrap gap-3 sm:gap-4">
                     {project.demo_url && (
                       <a
                         href={project.demo_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 bg-accent-cyan text-bg-primary rounded-lg hover:bg-accent-lime transition-colors"
+                        className="px-4 py-2 bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 rounded-lg hover:bg-accent-cyan/20 transition-all shadow-sm text-sm font-medium"
                       >
                         <FontAwesomeIcon
                           icon={faExternalLinkAlt}
@@ -202,7 +205,7 @@ const Portfolio = () => {
                         href={project.repo_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 bg-bg-secondary border border-accent-cyan/20 rounded-lg hover:bg-accent-cyan/10 transition-colors"
+                        className="px-4 py-2 card-elevated bg-bg-secondary rounded-lg hover:bg-bg-primary transition-all text-sm font-medium"
                       >
                         <FontAwesomeIcon icon={faCode} className="mr-2" />
                         Code
@@ -216,64 +219,67 @@ const Portfolio = () => {
         </div>
       </section>
 
-      {/* Experience Section */}
-      <section className="py-20 bg-bg-primary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold mb-12 text-center">
-            Work <span className="text-accent-cyan">Experience</span>
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-1 space-y-2">
-              {experience.map((exp, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveExp(idx)}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                    activeExp === idx
-                      ? 'bg-accent-cyan text-bg-primary'
-                      : 'bg-bg-card hover:bg-accent-cyan/10'
-                  }`}
-                >
-                  {exp.company}
-                </button>
-              ))}
-            </div>
-            <div className="lg:col-span-3 bg-bg-card p-8 rounded-lg border border-accent-cyan/20">
-              <h3 className="text-2xl font-bold mb-2">
-                {experience[activeExp].role}
-              </h3>
-              <p className="text-accent-lime mb-2">
-                {experience[activeExp].company} | {experience[activeExp].type}
-              </p>
-              <p className="text-text-secondary mb-4">
-                {experience[activeExp].duration} | {experience[activeExp].location}
-              </p>
-              <p className="text-text-secondary mb-6">
-                {experience[activeExp].description}
-              </p>
-              <h4 className="font-bold mb-2">Key Achievements:</h4>
-              <ul className="space-y-2 mb-6">
-                {experience[activeExp].achievements.map((achievement, aidx) => (
-                  <li key={aidx} className="flex items-start">
-                    <span className="text-accent-cyan mr-2">▸</span>
-                    <span className="text-text-secondary">{achievement}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap gap-2">
-                {experience[activeExp].technologies.map((tech, tidx) => (
-                  <span
-                    key={tidx}
-                    className="px-3 py-1 bg-accent-lime/10 text-accent-lime text-sm rounded-full"
+      {/* Experience Section - Hidden when no experience */}
+      {experience && experience.length > 0 && (
+        <section className="py-20 bg-bg-primary">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-center">
+              Work <span className="text-accent-cyan">Experience</span>
+            </h2>
+            <div className="divider-section max-w-md mx-auto"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
+              <div className="lg:col-span-1 space-y-2">
+                {experience.map((exp, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveExp(idx)}
+                    className={`w-full text-left px-4 py-3 rounded-lg transition-all text-sm font-medium ${
+                      activeExp === idx
+                        ? 'bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 shadow-sm'
+                        : 'card-elevated bg-bg-card hover:bg-bg-secondary'
+                    }`}
                   >
-                    {tech}
-                  </span>
+                    {exp.company}
+                  </button>
                 ))}
+              </div>
+              <div className="lg:col-span-3 card-elevated bg-bg-card p-6 sm:p-8 rounded-lg">
+                <h3 className="text-2xl font-bold mb-2">
+                  {experience[activeExp].role}
+                </h3>
+                <p className="text-accent-lime mb-2">
+                  {experience[activeExp].company} | {experience[activeExp].type}
+                </p>
+                <p className="text-text-secondary mb-4">
+                  {experience[activeExp].duration} | {experience[activeExp].location}
+                </p>
+                <p className="text-text-secondary mb-6">
+                  {experience[activeExp].description}
+                </p>
+                <h4 className="font-bold mb-2">Key Achievements:</h4>
+                <ul className="space-y-2 mb-6">
+                  {experience[activeExp].achievements.map((achievement, aidx) => (
+                    <li key={aidx} className="flex items-start">
+                      <span className="text-accent-cyan mr-2">▸</span>
+                      <span className="text-text-secondary">{achievement}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex flex-wrap gap-2">
+                  {experience[activeExp].technologies.map((tech, tidx) => (
+                    <span
+                      key={tidx}
+                      className="px-3 py-1 bg-accent-lime/10 text-accent-lime text-sm rounded-full"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   )
 }

@@ -34,6 +34,7 @@ class PostModel(BaseModel):
     author: str
     author_id: Optional[PyObjectId] = None
     featured_image: Optional[str] = None
+    images: List[str] = []  # Multiple image URLs
     tags: List[str] = []
     category: str = "general"
     published: bool = False

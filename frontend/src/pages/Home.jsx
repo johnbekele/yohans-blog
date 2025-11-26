@@ -94,7 +94,7 @@ const Home = () => {
               <Link
                 key={post._id}
                 to={`/blog/${post.slug}`}
-                className="bg-bg-card rounded-lg overflow-hidden hover:shadow-xl hover:shadow-accent-cyan/10 transition-all duration-300 group"
+                className="card-elevated bg-bg-card rounded-lg overflow-hidden group"
               >
                 {post.featured_image && (
                   <img
@@ -152,7 +152,7 @@ const Home = () => {
                 </Link>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-bg-card p-6 rounded-lg border border-accent-cyan/20">
+                <div className="card-elevated bg-bg-card p-6 rounded-lg">
                   <FontAwesomeIcon
                     icon={faCode}
                     className="text-4xl text-accent-cyan mb-4"
@@ -160,7 +160,7 @@ const Home = () => {
                   <h3 className="text-2xl font-bold mb-2">5+</h3>
                   <p className="text-text-secondary">Years Experience</p>
                 </div>
-                <div className="bg-bg-card p-6 rounded-lg border border-accent-lime/20">
+                <div className="card-elevated bg-bg-card p-6 rounded-lg">
                   <FontAwesomeIcon
                     icon={faRocket}
                     className="text-4xl text-accent-lime mb-4"

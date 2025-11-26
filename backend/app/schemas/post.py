@@ -10,6 +10,7 @@ class PostCreate(BaseModel):
     excerpt: str = Field(..., min_length=10, max_length=500)
     content: str = Field(..., min_length=50)
     featured_image: Optional[str] = None
+    images: List[str] = []  # Multiple image URLs
     tags: List[str] = []
     category: str = "general"
     published: bool = False
@@ -21,6 +22,7 @@ class PostUpdate(BaseModel):
     excerpt: Optional[str] = Field(None, min_length=10, max_length=500)
     content: Optional[str] = Field(None, min_length=50)
     featured_image: Optional[str] = None
+    images: Optional[List[str]] = None  # Multiple image URLs
     tags: Optional[List[str]] = None
     category: Optional[str] = None
     published: Optional[bool] = None
@@ -35,6 +37,7 @@ class PostResponse(BaseModel):
     content: str
     author: str
     featured_image: Optional[str] = None
+    images: List[str] = []  # Multiple image URLs
     tags: List[str]
     category: str
     published: bool
@@ -55,6 +58,7 @@ class PostListItem(BaseModel):
     excerpt: str
     author: str
     featured_image: Optional[str] = None
+    images: List[str] = []  # Multiple image URLs
     tags: List[str]
     category: str
     published: bool

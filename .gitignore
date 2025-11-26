@@ -1,0 +1,65 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/myenv/
+backend/myenv.old/
+backend/venv/
+backend/env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Node
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+frontend/package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+backend/backend.log
+
+# Database
+*.db
+*.sqlite
+
+# Build outputs
+frontend/dist/
+frontend/build/
+backend/dist/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Other projects
+portfolio2/
+

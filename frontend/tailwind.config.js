@@ -7,13 +7,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        'accent-cyan': '#00d9ff',
-        'accent-lime': '#ccff00',
-        'accent-cyan-dim': 'rgba(0, 217, 255, 0.1)',
-        'accent-lime-dim': 'rgba(204, 255, 0, 0.1)',
-        'bg-primary': '#0a0e1a',
-        'bg-secondary': '#151925',
-        'bg-card': '#1a1f2e',
+        'accent-cyan': 'var(--accent-cyan)',
+        'accent-lime': 'var(--accent-lime)',
+        'accent-cyan-dim': 'var(--accent-cyan-dim)',
+        'accent-lime-dim': 'var(--accent-lime-dim)',
+        'bg-primary': 'var(--bg-primary)',
+        'bg-secondary': 'var(--bg-secondary)',
+        'bg-card': 'var(--bg-card)',
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
       },
       fontFamily: {
         'code': ['Fira Code', 'monospace'],

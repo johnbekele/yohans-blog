@@ -13,7 +13,7 @@ const Navbar = () => {
   const toggleMenu = () => setIsOpen(!isOpen)
 
   return (
-    <nav className="bg-bg-secondary border-b border-accent-cyan/20 sticky top-0 z-50">
+    <nav className="bg-bg-secondary border-b border-professional sticky top-0 z-50 backdrop-blur-sm bg-opacity-95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -31,16 +31,10 @@ const Navbar = () => {
               Home
             </Link>
             <Link
-              to="/blog"
+              to="/contact"
               className="text-text-secondary hover:text-accent-cyan transition-colors"
             >
-              Blog
-            </Link>
-            <Link
-              to="/portfolio"
-              className="text-text-secondary hover:text-accent-cyan transition-colors"
-            >
-              Portfolio
+              Contact
             </Link>
 
             {/* Theme Toggle */}
@@ -54,32 +48,14 @@ const Navbar = () => {
               />
             </button>
 
-            {/* Auth Section */}
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
-                {user?.role === 'admin' && (
-                  <Link
-                    to="/admin"
-                    className="px-4 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-colors"
-                  >
-                    <FontAwesomeIcon icon={faUser} className="mr-2" />
-                    Admin
-                  </Link>
-                )}
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors"
-                >
-                  <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                  Logout
-                </button>
-              </div>
-            ) : (
+            {/* Hidden Auth Section - Still functional for logged in admins */}
+            {isAuthenticated && user?.role === 'admin' && (
               <Link
-                to="/login"
-                className="px-4 py-2 bg-accent-cyan text-bg-primary rounded-lg hover:bg-accent-lime transition-colors font-medium"
+                to="/admin"
+                className="px-4 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-colors"
               >
-                Login
+                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                Admin
               </Link>
             )}
           </div>
@@ -107,18 +83,11 @@ const Navbar = () => {
               Home
             </Link>
             <Link
-              to="/blog"
+              to="/contact"
               onClick={toggleMenu}
               className="block px-4 py-2 text-text-secondary hover:text-accent-cyan hover:bg-accent-cyan/10 rounded-lg transition-colors"
             >
-              Blog
-            </Link>
-            <Link
-              to="/portfolio"
-              onClick={toggleMenu}
-              className="block px-4 py-2 text-text-secondary hover:text-accent-cyan hover:bg-accent-cyan/10 rounded-lg transition-colors"
-            >
-              Portfolio
+              Contact
             </Link>
 
             <div className="flex items-center justify-between px-4 py-2">
@@ -134,36 +103,15 @@ const Navbar = () => {
               </button>
             </div>
 
-            {isAuthenticated ? (
-              <>
-                {user?.role === 'admin' && (
-                  <Link
-                    to="/admin"
-                    onClick={toggleMenu}
-                    className="block px-4 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-colors"
-                  >
-                    <FontAwesomeIcon icon={faUser} className="mr-2" />
-                    Admin Dashboard
-                  </Link>
-                )}
-                <button
-                  onClick={() => {
-                    logout()
-                    toggleMenu()
-                  }}
-                  className="w-full text-left px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors"
-                >
-                  <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                  Logout
-                </button>
-              </>
-            ) : (
+            {/* Hidden Auth Section - Still functional for logged in admins */}
+            {isAuthenticated && user?.role === 'admin' && (
               <Link
-                to="/login"
+                to="/admin"
                 onClick={toggleMenu}
-                className="block px-4 py-2 bg-accent-cyan text-bg-primary text-center rounded-lg hover:bg-accent-lime transition-colors font-medium"
+                className="block px-4 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-colors"
               >
-                Login
+                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                Admin Dashboard
               </Link>
             )}
           </div>

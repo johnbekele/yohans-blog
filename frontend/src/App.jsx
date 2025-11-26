@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Blog from './pages/Blog'
 import BlogPostPage from './pages/BlogPostPage'
 import Portfolio from './pages/Portfolio'
+import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import ProtectedRoute from './components/common/ProtectedRoute'
@@ -19,6 +20,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin/*"

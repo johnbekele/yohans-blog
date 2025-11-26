@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
-import { getPosts, createPost, updatePost, deletePost } from '../services/postService'
+import { Routes, Route, Link, useNavigate, useParams } from 'react-router-dom'
+import { getPosts, createPost, updatePost, deletePost, getPostBySlug } from '../services/postService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPlus,
@@ -10,7 +10,9 @@ import {
   faEyeSlash,
   faSave,
   faArrowLeft,
+  faMagic,
 } from '@fortawesome/free-solid-svg-icons'
+import AIBlogGenerator from '../components/AIBlogGenerator'
 
 const Admin = () => {
   return (
@@ -20,9 +22,36 @@ const Admin = () => {
           <Route path="/" element={<PostsList />} />
           <Route path="/create" element={<PostEditor />} />
           <Route path="/edit/:slug" element={<PostEditor />} />
+          <Route path="/ai-generator" element={<AIGeneratorPage />} />
         </Routes>
       </div>
     </div>
+  )
+}
+
+const AIGeneratorPage = () => {
+  const navigate = useNavigate()
+
+  return (
+    <>
+      <div className="mb-8">
+        <Link
+          to="/admin"
+          className="inline-flex items-center text-accent-cyan hover:text-accent-lime transition-colors mb-4"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+          Back to Dashboard
+        </Link>
+        <h1 className="text-4xl font-bold">
+          <span className="text-accent-cyan">AI</span> Blog Generator
+        </h1>
+        <p className="text-text-secondary mt-2">
+          Generate professional blog posts instantly using AI
+        </p>
+      </div>
+
+      <AIBlogGenerator />
+    </>
   )
 }
 
@@ -63,13 +92,22 @@ const PostsList = () => {
         <h1 className="text-4xl font-bold">
           <span className="text-accent-cyan">Admin</span> Dashboard
         </h1>
-        <Link
-          to="/admin/create"
-          className="px-6 py-3 bg-accent-cyan text-bg-primary rounded-lg hover:bg-accent-lime transition-colors font-medium"
-        >
-          <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          New Post
-        </Link>
+        <div className="flex space-x-4">
+          <Link
+            to="/admin/ai-generator"
+            className="px-6 py-3 bg-accent-lime/10 text-accent-lime border border-accent-lime/20 rounded-lg hover:bg-accent-lime/20 transition-colors font-medium"
+          >
+            <FontAwesomeIcon icon={faMagic} className="mr-2" />
+            AI Generator
+          </Link>
+          <Link
+            to="/admin/create"
+            className="px-6 py-3 bg-accent-cyan text-bg-primary rounded-lg hover:bg-accent-lime transition-colors font-medium"
+          >
+            <FontAwesomeIcon icon={faPlus} className="mr-2" />
+            New Post
+          </Link>
+        </div>
       </div>
 
       {loading ? (
@@ -77,61 +115,63 @@ const PostsList = () => {
           <div className="loading w-12 h-12 border-4 border-accent-cyan border-t-transparent rounded-full"></div>
         </div>
       ) : (
-        <div className="bg-bg-card rounded-lg border border-accent-cyan/20 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-bg-secondary">
-              <tr>
-                <th className="px-6 py-4 text-left">Title</th>
-                <th className="px-6 py-4 text-left">Category</th>
-                <th className="px-6 py-4 text-left">Status</th>
-                <th className="px-6 py-4 text-left">Views</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map((post) => (
-                <tr
-                  key={post._id}
-                  className="border-t border-accent-cyan/10 hover:bg-bg-secondary transition-colors"
-                >
-                  <td className="px-6 py-4">{post.title}</td>
-                  <td className="px-6 py-4">
-                    <span className="px-3 py-1 bg-accent-cyan/10 text-accent-cyan text-sm rounded-full">
-                      {post.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    {post.published ? (
-                      <span className="flex items-center text-green-400">
-                        <FontAwesomeIcon icon={faEye} className="mr-2" />
-                        Published
-                      </span>
-                    ) : (
-                      <span className="flex items-center text-yellow-400">
-                        <FontAwesomeIcon icon={faEyeSlash} className="mr-2" />
-                        Draft
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">{post.views}</td>
-                  <td className="px-6 py-4 text-right space-x-2">
-                    <Link
-                      to={`/admin/edit/${post.slug}`}
-                      className="px-4 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-colors"
-                    >
-                      <FontAwesomeIcon icon={faEdit} />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(post.slug)}
-                      className="px-4 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors"
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
+        <div className="card-elevated bg-bg-card rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead className="bg-bg-secondary border-b border-professional">
+                <tr>
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm font-semibold">Title</th>
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm font-semibold">Category</th>
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm font-semibold">Status</th>
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-sm font-semibold">Views</th>
+                  <th className="px-4 sm:px-6 py-3 sm:py-4 text-right text-sm font-semibold">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {posts.map((post) => (
+                  <tr
+                    key={post._id}
+                    className="border-t border-professional hover:bg-bg-secondary transition-colors"
+                  >
+                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm">{post.title}</td>
+                    <td className="px-4 sm:px-6 py-3 sm:py-4">
+                      <span className="px-3 py-1 bg-accent-cyan/10 text-accent-cyan text-xs rounded-full border border-accent-cyan/20">
+                        {post.category}
+                      </span>
+                    </td>
+                    <td className="px-4 sm:px-6 py-3 sm:py-4">
+                      {post.published ? (
+                        <span className="flex items-center text-green-400 text-sm">
+                          <FontAwesomeIcon icon={faEye} className="mr-2" />
+                          Published
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-yellow-400 text-sm">
+                          <FontAwesomeIcon icon={faEyeSlash} className="mr-2" />
+                          Draft
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm">{post.views}</td>
+                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-right space-x-2">
+                      <Link
+                        to={`/admin/edit/${post.slug}`}
+                        className="inline-flex px-3 py-2 bg-accent-cyan/10 text-accent-cyan rounded-lg hover:bg-accent-cyan/20 transition-all border border-accent-cyan/20 text-sm"
+                      >
+                        <FontAwesomeIcon icon={faEdit} />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(post.slug)}
+                        className="inline-flex px-3 py-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-all border border-red-500/20 text-sm"
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </>
@@ -149,6 +189,7 @@ const PostEditor = () => {
     category: 'general',
     tags: '',
     featured_image: '',
+    images: '',  // Comma-separated image URLs
     published: false,
   })
 
@@ -168,6 +209,7 @@ const PostEditor = () => {
         category: data.category,
         tags: data.tags.join(', '),
         featured_image: data.featured_image || '',
+        images: data.images ? data.images.join(', ') : '',  // Convert array to comma-separated
         published: data.published,
       })
     } catch (error) {
@@ -183,6 +225,7 @@ const PostEditor = () => {
       const postData = {
         ...formData,
         tags: formData.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        images: formData.images.split(',').map((img) => img.trim()).filter(Boolean),  // Convert to array
       }
 
       if (slug) {
@@ -214,7 +257,7 @@ const PostEditor = () => {
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-bg-card p-8 rounded-lg border border-accent-cyan/20">
+      <form onSubmit={handleSubmit} className="card-elevated bg-bg-card p-4 sm:p-6 lg:p-8 rounded-lg">
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium mb-2">Title</label>
@@ -234,7 +277,7 @@ const PostEditor = () => {
               onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
               required
               rows="3"
-              className="w-full px-4 py-3 bg-bg-secondary border border-accent-cyan/20 rounded-lg focus:outline-none focus:border-accent-cyan"
+              className="w-full px-4 py-3 bg-bg-secondary border-inset rounded-lg focus:outline-none focus:border-accent-cyan/40 focus:ring-2 focus:ring-accent-cyan/20 transition-all"
             />
           </div>
 
@@ -245,7 +288,7 @@ const PostEditor = () => {
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               required
               rows="12"
-              className="w-full px-4 py-3 bg-bg-secondary border border-accent-cyan/20 rounded-lg focus:outline-none focus:border-accent-cyan font-mono"
+              className="w-full px-4 py-3 bg-bg-secondary border-inset rounded-lg focus:outline-none focus:border-accent-cyan/40 focus:ring-2 focus:ring-accent-cyan/20 transition-all font-mono"
             />
           </div>
 
@@ -256,7 +299,7 @@ const PostEditor = () => {
                 type="text"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-3 bg-bg-secondary border border-accent-cyan/20 rounded-lg focus:outline-none focus:border-accent-cyan"
+                className="w-full px-4 py-3 bg-bg-secondary border-inset rounded-lg focus:outline-none focus:border-accent-cyan/40 focus:ring-2 focus:ring-accent-cyan/20 transition-all"
               />
             </div>
 
@@ -267,7 +310,7 @@ const PostEditor = () => {
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 placeholder="devops, aws, python"
-                className="w-full px-4 py-3 bg-bg-secondary border border-accent-cyan/20 rounded-lg focus:outline-none focus:border-accent-cyan"
+                className="w-full px-4 py-3 bg-bg-secondary border-inset rounded-lg focus:outline-none focus:border-accent-cyan/40 focus:ring-2 focus:ring-accent-cyan/20 transition-all"
               />
             </div>
           </div>
@@ -279,8 +322,21 @@ const PostEditor = () => {
               value={formData.featured_image}
               onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
               placeholder="https://..."
-              className="w-full px-4 py-3 bg-bg-secondary border border-accent-cyan/20 rounded-lg focus:outline-none focus:border-accent-cyan"
+              className="w-full px-4 py-3 bg-bg-secondary border-inset rounded-lg focus:outline-none focus:border-accent-cyan/40 focus:ring-2 focus:ring-accent-cyan/20 transition-all"
             />
+            <p className="text-xs text-text-secondary mt-1">Main cover image for the post</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Additional Images (comma-separated URLs)</label>
+            <textarea
+              value={formData.images}
+              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
+              placeholder="https://image1.jpg, https://image2.jpg, https://image3.jpg"
+              rows="3"
+              className="w-full px-4 py-3 bg-bg-secondary border-inset rounded-lg focus:outline-none focus:border-accent-cyan/40 focus:ring-2 focus:ring-accent-cyan/20 transition-all"
+            />
+            <p className="text-xs text-text-secondary mt-1">Multiple images for the post gallery (separated by commas)</p>
           </div>
 
           <div className="flex items-center">
@@ -315,10 +371,6 @@ const PostEditor = () => {
     </>
   )
 }
-
-// Missing import
-import { useParams } from 'react-router-dom'
-import { getPostBySlug } from '../services/postService'
 
 export default Admin
 

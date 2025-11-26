@@ -26,8 +26,8 @@ async def seed_portfolio():
     portfolio_data = {
         "personal_info": {
             "name": "Yohans (John) Bekele",
-            "role": "Application Support Analyst + Freelance Web Developer",
-            "bio": "I work as an Application Support Analyst maintaining production systems while freelancing as a web developer. I'm passionate about experimenting with LLMs—building API integrations, exploring agent architectures, vector databases, and RAG chains. I use Docker, AWS, Kubernetes for deployments and GitHub Actions with Datadog for monitoring, with a strong foundation in infrastructure development.",
+            "role": "Software Engineer",
+            "bio": "I'm a Software Engineer passionate about building scalable web applications and working with modern technologies. I enjoy experimenting with cloud infrastructure, DevOps practices, and exploring new frameworks to create efficient, user-friendly solutions.",
             "email": "yohans.Bekele@thomsonreuters.com",
             "github": "https://github.com/johnbekele",
             "linkedin": "https://www.linkedin.com/in/yohans-bekele",
@@ -146,83 +146,7 @@ async def seed_portfolio():
                 ]
             }
         ],
-        "experience": [
-            {
-                "company": "Thomson Reuters",
-                "role": "Product Application Support Specialist",
-                "type": "DevOps & Application Support",
-                "duration": "August 2024 – Present",
-                "location": "Hybrid Work",
-                "description": "Orchestrate end-to-end environment setup and provide expert DevOps support for enterprise deployments.",
-                "achievements": [
-                    "Set up Microsoft SQL Server clusters with 99.9% uptime",
-                    "Automated infrastructure provisioning reducing setup time by 60%",
-                    "Optimized database performance queries improving response time by 40%",
-                    "Implemented monitoring solutions detecting incidents 50% faster"
-                ],
-                "technologies": ["SQL Server", "Windows Server", "Network Provisioning", "Infrastructure Management", "Monitoring"]
-            },
-            {
-                "company": "State Street",
-                "role": "Financial Analyst",
-                "type": "Automation & Data Engineering",
-                "duration": "March 2023 – July 2024",
-                "location": "Hybrid",
-                "description": "Specialized in process automation and technical reporting to support financial operations.",
-                "achievements": [
-                    "Automated monthly reports reducing processing time from 8hrs to 30min",
-                    "Built VBA macros automating 70% of repetitive Excel workflows",
-                    "Created technical dashboards used by 100+ team members daily",
-                    "Reduced manual data errors by 85% through automation scripts"
-                ],
-                "technologies": ["Excel VBA", "VS Code", "Python", "Automation", "Data Visualization"]
-            },
-            {
-                "company": "Cisco",
-                "role": "Data Analyst",
-                "type": "Data Pipeline & ETL Engineering",
-                "duration": "August 2022 – February 2023",
-                "location": "Remote",
-                "description": "Delivered automation and data pipeline engineering for large-scale MSSP migration projects.",
-                "achievements": [
-                    "Built Apache NiFi pipelines processing 1M+ records daily",
-                    "Created Python automation reducing manual data cleansing by 70%",
-                    "Developed SQL ETL scripts migrating 5TB+ data with 99.9% accuracy",
-                    "Reduced data validation time by 30% through Bash automation"
-                ],
-                "technologies": ["Apache NiFi", "Python", "SQL", "Bash", "Oracle", "MySQL", "ETL"]
-            },
-            {
-                "company": "Infosys",
-                "role": "Senior Process Executive",
-                "type": "Application Performance & Monitoring",
-                "duration": "March 2022 – April 2023",
-                "location": "Remote",
-                "description": "Monitored application performance and automated operations for health suite platforms.",
-                "achievements": [
-                    "Achieved 99.8% application uptime through proactive monitoring",
-                    "Automated daily monitoring tasks saving 15hrs/week team time",
-                    "Implemented New Relic dashboards reducing MTTR by 45%",
-                    "Created automated alerting reducing incident response time by 50%"
-                ],
-                "technologies": ["New Relic", "ServiceNow", "JIRA", "JavaScript", "Python", "SQL"]
-            },
-            {
-                "company": "Commercial Bank of Ethiopia",
-                "role": "Data Analytics Engineer",
-                "type": "Analytics & Compliance",
-                "duration": "Feb 2017 – Jan 2019",
-                "location": "On-site",
-                "description": "Led KYC data analysis and built compliance reporting systems for risk monitoring.",
-                "achievements": [
-                    "Built Tableau dashboards monitoring 500K+ customer accounts",
-                    "Automated KYC validation reducing review time by 60%",
-                    "Created SQL reports supporting compliance audits with 100% accuracy",
-                    "Developed analytics reducing flagged account review time by 40%"
-                ],
-                "technologies": ["SQL", "Tableau", "Power BI", "VS Code", "Data Analytics"]
-            }
-        ]
+        "experience": []
     }
     
     result = await portfolio_collection.insert_one(portfolio_data)

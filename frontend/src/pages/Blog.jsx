@@ -91,14 +91,14 @@ const Blog = () => {
         </div>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="mb-8">
+        <form onSubmit={handleSearch} className="mb-12">
           <div className="relative max-w-2xl mx-auto">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search posts..."
-              className="w-full px-6 py-4 pl-12 bg-bg-card border border-accent-cyan/20 rounded-lg focus:outline-none focus:border-accent-cyan transition-colors"
+              className="w-full px-6 py-4 pl-12 bg-bg-card border-inset rounded-lg focus:outline-none focus:border-accent-cyan/40 focus:ring-2 focus:ring-accent-cyan/20 transition-all"
             />
             <FontAwesomeIcon
               icon={faSearch}
@@ -116,10 +116,10 @@ const Blog = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <aside className="lg:col-span-1">
-            <div className="bg-bg-card p-6 rounded-lg border border-accent-cyan/20 sticky top-20">
+            <div className="card-elevated bg-bg-card p-6 rounded-lg sticky top-24">
               {/* Categories */}
-              <div className="mb-6">
-                <h3 className="text-xl font-bold mb-4 flex items-center">
+              <div className="mb-8">
+                <h3 className="text-xl font-bold mb-4 flex items-center pb-3 border-b border-professional">
                   <FontAwesomeIcon
                     icon={faFolder}
                     className="text-accent-cyan mr-2"
@@ -131,10 +131,10 @@ const Blog = () => {
                     <button
                       key={category}
                       onClick={() => handleCategoryClick(category)}
-                      className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
+                      className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
                         selectedCategory === category
-                          ? 'bg-accent-cyan text-bg-primary'
-                          : 'bg-bg-secondary hover:bg-accent-cyan/10 text-text-secondary'
+                          ? 'bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 shadow-sm'
+                          : 'bg-bg-secondary/50 hover:bg-bg-secondary text-text-secondary hover:text-text-primary border border-transparent'
                       }`}
                     >
                       {category}
@@ -145,7 +145,7 @@ const Blog = () => {
 
               {/* Tags */}
               <div>
-                <h3 className="text-xl font-bold mb-4 flex items-center">
+                <h3 className="text-xl font-bold mb-4 flex items-center pb-3 border-b border-professional">
                   <FontAwesomeIcon
                     icon={faTag}
                     className="text-accent-lime mr-2"
@@ -157,10 +157,10 @@ const Blog = () => {
                     <button
                       key={tag}
                       onClick={() => handleTagClick(tag)}
-                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                         selectedTag === tag
-                          ? 'bg-accent-lime text-bg-primary'
-                          : 'bg-bg-secondary hover:bg-accent-lime/10 text-text-secondary'
+                          ? 'bg-accent-lime/10 text-accent-lime border border-accent-lime/30 shadow-sm'
+                          : 'bg-bg-secondary/50 hover:bg-bg-secondary text-text-secondary hover:text-text-primary border border-transparent'
                       }`}
                     >
                       {tag}
@@ -190,7 +190,7 @@ const Blog = () => {
                     <Link
                       key={post._id}
                       to={`/blog/${post.slug}`}
-                      className="bg-bg-card rounded-lg overflow-hidden hover:shadow-xl hover:shadow-accent-cyan/10 transition-all duration-300 group border border-accent-cyan/10"
+                      className="card-elevated bg-bg-card rounded-lg overflow-hidden group"
                     >
                       {post.featured_image && (
                         <img
@@ -246,11 +246,11 @@ const Blog = () => {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex justify-center gap-2">
+                  <div className="flex justify-center gap-2 flex-wrap">
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="px-4 py-2 bg-bg-card rounded-lg hover:bg-accent-cyan/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-bg-card rounded-lg hover:bg-bg-secondary border border-professional transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                     >
                       Previous
                     </button>
@@ -259,10 +259,10 @@ const Blog = () => {
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-4 py-2 rounded-lg transition-colors ${
+                          className={`px-4 py-2 rounded-lg transition-all text-sm font-medium ${
                             currentPage === page
-                              ? 'bg-accent-cyan text-bg-primary'
-                              : 'bg-bg-card hover:bg-accent-cyan/10'
+                              ? 'bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/30 shadow-sm'
+                              : 'bg-bg-card hover:bg-bg-secondary border border-professional'
                           }`}
                         >
                           {page}
@@ -274,7 +274,7 @@ const Blog = () => {
                         setCurrentPage((p) => Math.min(totalPages, p + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className="px-4 py-2 bg-bg-card rounded-lg hover:bg-accent-cyan/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-bg-card rounded-lg hover:bg-bg-secondary border border-professional transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                     >
                       Next
                     </button>
