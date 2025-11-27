@@ -1,14 +1,23 @@
 import api from './api'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-
-export const generateBlogPost = async (idea) => {
-  const response = await api.post(`${API_BASE}/ai/generate`, { idea })
+export const generateAndPostBlog = async (idea, model = 'gpt') => {
+  console.log('📤 DEBUG [aiService]: Sending request', { idea, model })
+  const response = await api.post('/ai/generate-and-post', { 
+    idea,
+    model  // 'gpt' or 'gemini'
+  })
+  console.log('📥 DEBUG [aiService]: Raw response:', response)
+  console.log('📥 DEBUG [aiService]: Response data:', response.data)
+  console.log('📥 DEBUG [aiService]: Response data type:', typeof response.data)
   return response.data
 }
 
-export const generateAndPostBlog = async (idea) => {
-  const response = await api.post(`${API_BASE}/ai/generate-and-post`, { idea })
-  return response.data
+export const checkGeminiAvailability = async () => {
+  try {
+    // For now, assume Gemini is available on the backend
+    // The backend will return an error if it's not configured
+    return { available: true }
+  } catch (error) {
+    return { available: false }
+  }
 }
-
