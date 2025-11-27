@@ -27,16 +27,29 @@ app = FastAPI(
 )
 
 # Add CORS middleware
+# Get allowed origins from settings
+allowed_origins = list(settings.CORS_ORIGINS) if settings.CORS_ORIGINS else []
+
+# Add default localhost origins
+default_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+]
+
+# Add production URLs
+production_origins = [
+    "https://yohans-blog.vercel.app",
+    "https://wise-trade-client.vercel.app",
+]
+
+# Combine all origins, avoiding duplicates
+all_origins = set(allowed_origins + default_origins + production_origins)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "https://wise-trade-client.vercel.app"
-        "https://yohans-blog.vercel.app"
-    ],
+    allow_origins=list(all_origins),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
