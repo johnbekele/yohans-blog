@@ -20,7 +20,9 @@ export const getItem = (key) => {
   } catch (error) {
     // Handle localStorage errors (quota exceeded, privacy mode, etc.)
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`Failed to read from storage: ${key}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`Failed to read from storage: ${key}`)
+      }
     }
     return null
   }
@@ -36,7 +38,9 @@ export const setItem = (key, value) => {
   } catch (error) {
     // Handle localStorage errors (quota exceeded, privacy mode, etc.)
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`Failed to write to storage: ${key}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`Failed to write to storage: ${key}`)
+      }
     }
     return false
   }
@@ -51,7 +55,9 @@ export const removeItem = (key) => {
     return true
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`Failed to remove from storage: ${key}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`Failed to remove from storage: ${key}`)
+      }
     }
     return false
   }
@@ -66,7 +72,9 @@ export const clear = () => {
     return true
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('Failed to clear storage')
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to clear storage')
+      }
     }
     return false
   }
@@ -80,7 +88,9 @@ export const parseJSON = (value, fallback = null) => {
     return value ? JSON.parse(value) : fallback
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('Failed to parse JSON')
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to parse JSON')
+      }
     }
     return fallback
   }

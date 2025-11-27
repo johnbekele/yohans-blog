@@ -42,26 +42,37 @@ export const getErrorMessage = (error) => {
 }
 
 /**
- * Log errors in development mode only
- */
-export const logError = (context, error) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.error(`[${context}]`, error)
-  }
-}
-
-/**
  * Sanitize error for logging (remove sensitive data)
  */
 export const sanitizeError = (error) => {
   if (!error) return null
   
+  // Create a safe error object without sensitive data
   const sanitized = {
-    message: error.message,
+    message: error.message || 'Unknown error',
     status: error.response?.status,
-    // Never log response data as it might contain sensitive info
+    statusText: error.response?.statusText,
+    // Never log: request data, response data, tokens, passwords, user data
+  }
+  
+  // Remove any potential sensitive fields
+  if (error.config) {
+    sanitized.url = error.config.url
+    sanitized.method = error.config.method
+    // Don't log headers, data, or params as they may contain sensitive info
   }
   
   return sanitized
+}
+
+/**
+ * Log errors in development mode only with sanitized data
+ */
+export const logError = (context, error) => {
+  if (process.env.NODE_ENV === 'development') {
+    const sanitized = sanitizeError(error)
+    console.error(`[${context}]`, sanitized)
+  }
+  // In production, errors are silently handled - no console logging
 }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getPortfolio } from '../services/portfolioService'
+import { logError } from '../utils/errorHandler'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faGithub,
@@ -26,7 +27,7 @@ const Portfolio = () => {
       const data = await getPortfolio()
       setPortfolio(data)
     } catch (error) {
-      console.error('Error fetching portfolio:', error)
+      logError('Portfolio.fetchPortfolio', error)
     } finally {
       setLoading(false)
     }

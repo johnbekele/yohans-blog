@@ -74,7 +74,10 @@ async def validate_and_fix_images(featured_image: Optional[str], images: List[st
     if featured_image:
         is_valid = await check_image_url(featured_image)
         if not is_valid:
-            print(f"⚠️ Featured image not accessible, generating fallback...")
+            # Only log in debug mode
+            import os
+            if os.getenv("DEBUG", "False").lower() == "true":
+                print("⚠️ Featured image not accessible, generating fallback...")
             validated_featured = generate_fallback_image(topic, 1200, 600, 0)
     else:
         # No featured image provided, generate one
@@ -87,7 +90,10 @@ async def validate_and_fix_images(featured_image: Optional[str], images: List[st
         if is_valid:
             validated_images.append(img_url)
         else:
-            print(f"⚠️ Image {idx+1} not accessible, generating fallback...")
+            # Only log in debug mode
+            import os
+            if os.getenv("DEBUG", "False").lower() == "true":
+                print(f"⚠️ Image {idx+1} not accessible, generating fallback...")
             validated_images.append(generate_fallback_image(topic, 800, 600, idx + 1))
     
     # If no images provided, generate 2-3 default ones

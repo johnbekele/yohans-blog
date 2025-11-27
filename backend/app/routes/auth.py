@@ -257,8 +257,11 @@ async def forgot_password(request: PasswordResetRequest):
     )
     
     if not email_sent:
-        # Log error but don't expose it to user
-        print(f"Failed to send password reset email to {user['email']}")
+        # Log error but don't expose email or sensitive data
+        # Only log in development/debug mode
+        import os
+        if os.getenv("DEBUG", "False").lower() == "true":
+            print(f"Failed to send password reset email")
     
     return {
         "message": "If an account with that email exists, a password reset link has been sent."

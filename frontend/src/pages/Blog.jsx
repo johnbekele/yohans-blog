@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getPosts, getAllTags, getAllCategories } from '../services/postService'
+import { logError } from '../utils/errorHandler'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faSearch,
@@ -41,7 +42,7 @@ const Blog = () => {
       setPosts(data.posts)
       setTotalPages(data.total_pages)
     } catch (error) {
-      console.error('Error fetching posts:', error)
+      logError('Blog.fetchPosts', error)
     } finally {
       setLoading(false)
     }
@@ -56,7 +57,7 @@ const Blog = () => {
       setTags(tagsData)
       setCategories(categoriesData)
     } catch (error) {
-      console.error('Error fetching filters:', error)
+      logError('Blog.fetchFilters', error)
     }
   }
 

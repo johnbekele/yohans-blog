@@ -16,7 +16,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         hash_bytes = hashed_password.encode('utf-8')
         return bcrypt.checkpw(password_bytes, hash_bytes)
     except Exception as e:
-        print(f"Password verification error: {e}")
+        # Only log error type in debug mode, never log password or token details
+        import os
+        if os.getenv("DEBUG", "False").lower() == "true":
+            error_type = type(e).__name__
+            print(f"Password verification error: {error_type}")
         return False
 
 

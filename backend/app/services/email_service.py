@@ -30,7 +30,10 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         if not self.smtp_user or not self.smtp_password:
-            print("⚠️ SMTP credentials not configured. Email not sent.")
+            # Only log in debug mode
+            import os
+            if os.getenv("DEBUG", "False").lower() == "true":
+                print("⚠️ SMTP credentials not configured. Email not sent.")
             return False
         
         try:
@@ -57,7 +60,11 @@ class EmailService:
             return True
             
         except Exception as e:
-            print(f"❌ Error sending email: {str(e)}")
+            # Only log error type, not full details (may contain sensitive info)
+            import os
+            if os.getenv("DEBUG", "False").lower() == "true":
+                error_type = type(e).__name__
+                print(f"❌ Error sending email: {error_type}")
             return False
     
     def send_password_reset_email(self, to_email: str, reset_token: str, username: str) -> bool:

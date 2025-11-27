@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { logError } from '../utils/errorHandler'
 import { getPosts } from '../services/postService'
 import { getPersonalInfo } from '../services/portfolioService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, Link, useNavigate, useParams } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate, useParams, Navigate } from 'react-router-dom'
 import { getPosts, createPost, updatePost, deletePost, getPostBySlug } from '../services/postService'
+import { logError } from '../utils/errorHandler'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPlus,
@@ -26,6 +27,7 @@ const Admin = () => {
     <div className="min-h-screen bg-bg-primary py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Routes>
+          <Route path="/" element={<Navigate to="/admin/posts" replace />} />
           <Route path="/posts" element={<PostsPage />} />
           <Route path="/posts/create" element={<PostEditor />} />
           <Route path="/posts/edit/:slug" element={<PostEditor />} />
@@ -169,7 +171,7 @@ const PostsList = () => {
       const data = await getPosts({ published_only: false, page_size: 50 })
       setPosts(data.posts)
     } catch (error) {
-      console.error('Error fetching posts:', error)
+      logError('Admin.fetchPosts', error)
     } finally {
       setLoading(false)
     }
@@ -302,7 +304,7 @@ const PostEditor = () => {
         published: data.published,
       })
     } catch (error) {
-      console.error('Error fetching post:', error)
+      logError('Admin.fetchPost', error)
     }
   }
 
