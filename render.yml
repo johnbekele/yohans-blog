@@ -34,6 +34,13 @@ services:
         value: https://yohans-blog.vercel.app,https://wise-trade-client.vercel.app
       - key: FRONTEND_URL
         value: https://yohans-blog.vercel.app
+      # OAuth Configuration
+      - key: OAUTH_CLIENT_ID
+        sync: false  # Set this in Render dashboard
+      - key: OAUTH_CLIENT_SECRET
+        sync: false  # Set this in Render dashboard
+      - key: OAUTH_REDIRECT_URI
+        sync: false  # Set to: https://your-frontend-url.com/oauth/callback
       # Optional: Set these if you're using AI features
       - key: TR_GPT_TOKEN
         sync: false

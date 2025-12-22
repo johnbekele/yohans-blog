@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getOAuthUrl } from '../services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faLock, faSignInAlt } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faLock, faSignInAlt, faGoogle } from '@fortawesome/free-solid-svg-icons'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -28,6 +29,15 @@ const Login = () => {
       setError(err.response?.data?.detail || 'Login failed. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleOAuthLogin = async () => {
+    try {
+      const authUrl = await getOAuthUrl()
+      window.location.href = authUrl
+    } catch (err) {
+      setError(err.response?.data?.detail || 'OAuth login failed')
     }
   }
 
@@ -133,7 +143,20 @@ const Login = () => {
         </div>
 
         <div className="mt-6 p-4 bg-bg-secondary rounded-lg border border-accent-lime/20">
-        
+          <div className="flex items-center mb-4">
+            <div className="flex-1 border-t border-accent-lime/20"></div>
+            <span className="px-4 text-text-secondary text-sm">Or</span>
+            <div className="flex-1 border-t border-accent-lime/20"></div>
+          </div>
+          
+          <button
+            type="button"
+            onClick={handleOAuthLogin}
+            className="w-full py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center justify-center border border-gray-300"
+          >
+            <FontAwesomeIcon icon={faGoogle} className="mr-2 text-red-500" />
+            Sign in with Google
+          </button>
         </div>
       </div>
     </div>

@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     FRONTEND_URL: str = "http://localhost:5174"
     
+    # OAuth Configuration
+    OAUTH_CLIENT_ID: str = ""
+    OAUTH_CLIENT_SECRET: str = ""
+    OAUTH_REDIRECT_URI: str = ""
+    
     # Application
     APP_NAME: str = "Blog Portfolio API"
     APP_VERSION: str = "1.0.0"

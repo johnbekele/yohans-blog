@@ -1,9 +1,10 @@
 """Authentication routes"""
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from bson import ObjectId
+import httpx
 
 from ..database import get_database, USERS_COLLECTION
 from ..schemas.auth import UserCreate, UserLogin, Token, UserResponse, RefreshTokenRequest
@@ -14,6 +15,7 @@ from ..utils.security import (
 from ..middleware.auth_middleware import get_current_user
 from ..schemas.auth import TokenData
 from ..services.email_service import email_service
+from ..config import settings
 
 
 router = APIRouter()
@@ -384,4 +386,126 @@ async def change_password(
     )
     
     return {"message": "Password has been changed successfully"}
+
+
+@router.get("/oauth/google")
+async def oauth_google_redirect():
+    """Get Google OAuth authorization URL"""
+    if not settings.OAUTH_CLIENT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OAuth not configured"
+        )
+    
+    redirect_uri = settings.OAUTH_REDIRECT_URI or f"{settings.FRONTEND_URL}/oauth/callback"
+    auth_url = (
+        f"https://accounts.google.com/o/oauth2/v2/auth?"
+        f"client_id={settings.OAUTH_CLIENT_ID}&"
+        f"redirect_uri={redirect_uri}&"
+        f"response_type=code&"
+        f"scope=openid email profile&"
+        f"access_type=offline"
+    )
+    
+    return {"auth_url": auth_url}
+
+
+@router.post("/oauth/google/callback")
+async def oauth_google_callback(code: str = Query(...)):
+    """Handle Google OAuth callback and create/login user"""
+    if not settings.OAUTH_CLIENT_ID or not settings.OAUTH_CLIENT_SECRET:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="OAuth not configured"
+        )
+    
+    redirect_uri = settings.OAUTH_REDIRECT_URI or f"{settings.FRONTEND_URL}/oauth/callback"
+    
+    # Exchange code for tokens
+    try:
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                "https://oauth2.googleapis.com/token",
+                data={
+                    "code": code,
+                    "client_id": settings.OAUTH_CLIENT_ID,
+                    "client_secret": settings.OAUTH_CLIENT_SECRET,
+                    "redirect_uri": redirect_uri,
+                    "grant_type": "authorization_code",
+                },
+            )
+            token_response.raise_for_status()
+            tokens = token_response.json()
+            
+            # Get user info
+            user_response = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {tokens['access_token']}"},
+            )
+            user_response.raise_for_status()
+            google_user = user_response.json()
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to authenticate with Google"
+        )
+    
+    db = get_database()
+    users_collection = db[USERS_COLLECTION]
+    
+    # Find or create user
+    user = await users_collection.find_one({"email": google_user["email"]})
+    
+    if not user:
+        # Create new user
+        user_dict = {
+            "username": google_user.get("name", google_user["email"].split("@")[0]),
+            "email": google_user["email"],
+            "password": "",  # OAuth users don't have passwords
+            "role": "user",
+            "oauth_provider": "google",
+            "oauth_id": google_user["id"],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        result = await users_collection.insert_one(user_dict)
+        user_dict["_id"] = result.inserted_id
+        user = user_dict
+    else:
+        # Update existing user with OAuth info if needed
+        if "oauth_provider" not in user:
+            await users_collection.update_one(
+                {"_id": user["_id"]},
+                {
+                    "$set": {
+                        "oauth_provider": "google",
+                        "oauth_id": google_user["id"],
+                        "updated_at": datetime.utcnow()
+                    }
+                }
+            )
+    
+    # Generate JWT tokens
+    token_data = {
+        "sub": str(user["_id"]),
+        "email": user["email"],
+        "role": user["role"]
+    }
+    access_token = create_access_token(token_data)
+    refresh_token = create_refresh_token(token_data)
+    
+    # Prepare user response
+    user_response = UserResponse(
+        _id=str(user["_id"]),
+        username=user["username"],
+        email=user["email"],
+        role=user["role"],
+        created_at=user["created_at"].isoformat()
+    )
+    
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        user=user_response
+    )
 

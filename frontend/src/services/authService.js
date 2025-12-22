@@ -114,3 +114,29 @@ export const changePassword = async (currentPassword, newPassword) => {
   }
 }
 
+export const getOAuthUrl = async () => {
+  try {
+    const response = await api.get('/auth/oauth/google')
+    return response.data.auth_url
+  } catch (error) {
+    logError('AuthService.getOAuthUrl', error)
+    throw error
+  }
+}
+
+export const oauthCallback = async (code) => {
+  try {
+    const response = await api.post(`/auth/oauth/google/callback?code=${code}`)
+    const { access_token, refresh_token, user } = response.data
+    
+    setItem(STORAGE_KEYS.ACCESS_TOKEN, access_token)
+    setItem(STORAGE_KEYS.REFRESH_TOKEN, refresh_token)
+    setItem(STORAGE_KEYS.USER, JSON.stringify(user))
+    
+    return response.data
+  } catch (error) {
+    logError('AuthService.oauthCallback', error)
+    throw error
+  }
+}
+
