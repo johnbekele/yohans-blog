@@ -63,8 +63,22 @@ async def get_posts(
     skip = (page - 1) * page_size
     total_pages = math.ceil(total / page_size)
     
-    # Get posts
-    cursor = posts_collection.find(query).sort("created_at", -1).skip(skip).limit(page_size)
+    # Get posts with projection to only fetch needed fields (faster queries)
+    projection = {
+        "_id": 1,
+        "title": 1,
+        "slug": 1,
+        "excerpt": 1,
+        "author": 1,
+        "featured_image": 1,
+        "tags": 1,
+        "category": 1,
+        "published": 1,
+        "views": 1,
+        "read_time": 1,
+        "created_at": 1
+    }
+    cursor = posts_collection.find(query, projection).sort("created_at", -1).skip(skip).limit(page_size)
     posts = await cursor.to_list(length=page_size)
     
     # Format response

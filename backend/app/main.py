@@ -1,6 +1,7 @@
 """FastAPI application entry point"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from contextlib import asynccontextmanager
 
 from .config import settings
@@ -18,25 +19,33 @@ async def lifespan(app: FastAPI):
     await close_mongo_connection()
 
 
-# Create FastAPI application
+# Create FastAPI application with optimized settings
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="Backend API for Blog Portfolio platform",
-    lifespan=lifespan
+    lifespan=lifespan,
+    # Disable docs in production for better security (can be enabled if needed)
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
 )
+
+# Add compression middleware for faster responses
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Add CORS middleware
 # Get allowed origins from settings
 allowed_origins = list(settings.CORS_ORIGINS) if settings.CORS_ORIGINS else []
 
-# Add default localhost origins
-default_origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-]
+# Add default localhost origins (only in debug mode)
+default_origins = []
+if settings.DEBUG:
+    default_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ]
 
 # Add production URLs
 production_origins = [
@@ -51,8 +60,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=list(all_origins),
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
 # Include routers

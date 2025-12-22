@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: yohans-blog-api
+    runtime: python
+    plan: starter  # Can upgrade to standard/pro for better performance
+    region: oregon  # Choose closest region to your users
+    buildCommand: pip install -r backend/requirements.txt
+    # Optimized for starter plan: 2 workers (upgrade to 4+ for standard/pro plans)
+    # Worker settings: timeout 120s, keep-alive 2s, max-requests 1000 with jitter for graceful restarts
+    startCommand: cd backend && gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --timeout 120 --keep-alive 2 --max-requests 1000 --max-requests-jitter 50 --log-level info --access-logfile - --error-logfile -
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: MONGODB_URI
+        sync: false  # Set this in Render dashboard
+      - key: DATABASE_NAME
+        value: blog_portfolio
+      - key: JWT_SECRET_KEY
+        sync: false  # Set this in Render dashboard
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: DEBUG
+        value: false
+      - key: APP_NAME
+        value: Blog Portfolio API
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: CORS_ORIGINS
+        value: https://yohans-blog.vercel.app,https://wise-trade-client.vercel.app
+      - key: FRONTEND_URL
+        value: https://yohans-blog.vercel.app
+      # Optional: Set these if you're using AI features
+      - key: TR_GPT_TOKEN
+        sync: false
+      - key: GOOGLE_AI_API
+        sync: false
+      # Optional: Set these if you're using email features
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+
