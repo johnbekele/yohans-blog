@@ -3,7 +3,8 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getOAuthUrl } from '../services/authService'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faLock, faSignInAlt, faGoogle } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faLock, faSignInAlt } from '@fortawesome/free-solid-svg-icons'
+import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 
 const Login = () => {
   const [email, setEmail] = useState('')
