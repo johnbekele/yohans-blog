@@ -1,11 +1,17 @@
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY package.json .
-
-RUN npm install
-
-COPY . .
-
-CMD ["npm", "run", "dev"]
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      - env_file: .env
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+    environment:
+      - env_file: .env

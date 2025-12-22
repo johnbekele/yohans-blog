@@ -25,7 +25,9 @@ const OAuthCallback = () => {
         setUser(data.user)
         navigate('/admin', { replace: true })
       } catch (err) {
-        setError(err.response?.data?.detail || 'OAuth authentication failed')
+        const errorMessage = err.response?.data?.detail || err.message || 'OAuth authentication failed'
+        console.error('OAuth callback error:', err)
+        setError(errorMessage)
         setLoading(false)
       }
     }

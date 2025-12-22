@@ -126,7 +126,7 @@ export const getOAuthUrl = async () => {
 
 export const oauthCallback = async (code) => {
   try {
-    const response = await api.post(`/auth/oauth/google/callback?code=${code}`)
+    const response = await api.post(`/auth/oauth/google/callback?code=${encodeURIComponent(code)}`)
     const { access_token, refresh_token, user } = response.data
     
     setItem(STORAGE_KEYS.ACCESS_TOKEN, access_token)
@@ -136,6 +136,10 @@ export const oauthCallback = async (code) => {
     return response.data
   } catch (error) {
     logError('AuthService.oauthCallback', error)
+    // Log more details for debugging
+    if (error.response) {
+      console.error('OAuth callback error response:', error.response.data)
+    }
     throw error
   }
 }

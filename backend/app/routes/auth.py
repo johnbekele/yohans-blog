@@ -445,9 +445,20 @@ async def oauth_google_callback(code: str = Query(...)):
             user_response.raise_for_status()
             google_user = user_response.json()
     except httpx.HTTPStatusError as e:
+        error_detail = "Failed to authenticate with Google"
+        try:
+            error_data = e.response.json()
+            error_detail = error_data.get("error_description", error_data.get("error", error_detail))
+        except:
+            error_detail = f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to authenticate with Google"
+            detail=error_detail
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"OAuth error: {str(e)}"
         )
     
     db = get_database()
